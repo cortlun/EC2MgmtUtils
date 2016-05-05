@@ -58,6 +58,10 @@ class AwsUtils:
         if previous_ip is not None:
             revoke_firewall_privelege(group_name, port, protocol, previous_ip)        
         self.cp_utils.spawn_child_process(["aws", "ec2", "authorize-security-group-ingress", "--group-name", group_name, "--protocol", protocol, "--port", port, "--cidr", ip])
+	def allocate_address(self):
+		self.cp_utils.spawn_child_process(["aws", "ec2", "allocate-address"])
+	def associate_address(self, instance_id, elastic_ip):
+		self.cp_utils.spawn_child_process(["aws", "ec2", "associate-address", "--instance-id", instance_id, "--public-ip", elastic_ip])
     def get_my_current_ip(self):
         return urllib.request.urlopen("http://checkip.amazonaws.com").read().decode("utf-8").rstrip("\r\n") + "/32"
     def log_current_ip(self):

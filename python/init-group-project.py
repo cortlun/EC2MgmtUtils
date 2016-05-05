@@ -30,6 +30,8 @@ class GroupProject:
 		self.import_key_pair()
 		instance_id = self.launch_instance()
 		self.apply_security_policy_to_group(instance_id, security_group_id)
+		elastic_ip = self.get_ip_address()
+		self.associate_ip_address(instance_id, elastic_ip)
 	#Initialize members and a group for the project.  Add members to that group.
 	def create_group_and_members(self):
 		json_response = json.loads(self.aws_utils.create_group(self.group_name))
@@ -64,6 +66,12 @@ class GroupProject:
 		policy_arn = policy_arn_object['Policy']['ARN']
 		#Attach the policy arn to the group
 		self.aws_utils.attach_policy_to_group(policy_arn, self.group_name)
+	def get_ip_address(self):
+		json_response = json.loads(self.aws_utils.allocate_address())
+		elastic_ip = json_response['PublicIp']
+		return elastic_ip
+	def associate_ip_address(self, instance_id, elastic_ip):
+		self.aws_utils.associate_address(instance_id, elastic_ip)
 
 #Member class to hold individual group members.
 class Member:

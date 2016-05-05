@@ -1,7 +1,5 @@
 import awsutils
-from Crypto.PublicKey import RSA
 import json
-#Example: http://stackoverflow.com/questions/12344332/parsing-muilti-dimensional-json-array-to-python
 	
 #A group project object necessary for initializing a group project.
 #It currently assumes a single EC2 instance per project.
@@ -22,6 +20,7 @@ class GroupProject:
 		self.key_name = self.project_name + "_KEY_PAIR"
 		self.instance_type = instance_type
 		self.security_policy_name = self.project_name + "_SECURITY_POLICY"
+		self.pub_key = pub_key
 	#Run the sequence of methods necessary to create users, a group, a policy, a key pair, and an instance id.  Please have
 	#a private/public key ready to go.  The public key file is necessary for creating the key pair and launching the instance.
 	#The private key file is necessary to root into the box.
@@ -41,10 +40,7 @@ class GroupProject:
 		return json_response['GroupId']
 	#Create a key pair to be used for the new instance(s)
 	def import_key_pair(self):
-		with open(self.pub_key, "r") as pub_file:
-			key = RSA.importKey(pub_file.read())
-			print(key)
-		self.aws_utils.import_key_pair(key, project_name + "_KEY_PAIR")
+		self.aws_utils.import_key_pair(pub_key, project_name + "_KEY_PAIR")
 	#Launch the instance
 	def launch_instance(self):
 		instance_json = json.loads(self.aws_utils.run_instances(self.image_id, self.image_count, self.instance_type, self.key_name, self.security_group_name))

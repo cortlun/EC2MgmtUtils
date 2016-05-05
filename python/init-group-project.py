@@ -7,7 +7,7 @@ class GroupProject:
 	#Constructor variables are necessary for creating group project objects in AWS
 	#Most objects (eg security group, group, instance name, policies, etc.) are derived
 	#from project name
-	def __init__(self, project_name, members, class_id, admin_user, pub_key, image_id, image_count, instance_type):
+	def __init__(self, project_name, members, class_id, admin_user, pub_key, image_id, image_count, instance_type, account_id, region):
 		self.image_id = image_id
 		self.image_count = image_count
 		self.admin_user = admin_user
@@ -55,7 +55,7 @@ class GroupProject:
 	#Create the group policy, attach it the group
 	def apply_security_policy_to_group(self, instance_id, security_group_id):
 		#The below JSON gives the whole group access to start/stop the instance and to authorize and revoke ingress firewall rules.
-		json_string = {"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":["ec2:StartInstances","ec2:StopInstances"],"Resource":["arn:aws:ec2:us-east-1:821971883038:instance/"+self.instance_id]},{"Effect":"Allow","Action":"ec2:DescribeInstances","Resource":"*"},{"Effect":"Allow","Action":"ec2:DescribeRegions","Resource":"*"},{"Effect":"Allow","Action":["ec2:RevokeSecurityGroupIngress"],"Resource":["arn:aws:ec2:us-east-1:821971883038:security-group/"+security_group_id]},{"Effect":"Allow","Action":["ec2:AuthorizeSecurityGroupIngress"],"Resource":["arn:aws:ec2:us-east-1:821971883038:security-group/"+security_group_id]}]}
+		json_string = {"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":["ec2:StartInstances","ec2:StopInstances"],"Resource":["arn:aws:ec2:us-east-1:" + account_id + ":instance/"+self.instance_id]},{"Effect":"Allow","Action":"ec2:DescribeInstances","Resource":"*"},{"Effect":"Allow","Action":"ec2:DescribeRegions","Resource":"*"},{"Effect":"Allow","Action":["ec2:RevokeSecurityGroupIngress"],"Resource":["arn:aws:ec2:us-east-1:" + account_id + ":security-group/"+security_group_id]},{"Effect":"Allow","Action":["ec2:AuthorizeSecurityGroupIngress"],"Resource":["arn:aws:ec2:" + region + ":" + account_id + ":security-group/"+security_group_id]}]}
 		dump = json.dumps(json_string)
 		policy_object = json.loads(json_dump)
 		print(json_object)
@@ -82,7 +82,7 @@ if __name__ == "__main__":
 	members.append(Member("John", "Doe", "jdoe@stthomas.edu"))
 	
 	#Create group project
-	group_project = GroupProject("IOT_PROJECT", members, "SEIS_785", "clunke", "C:\users\lunk0002\misc\iot.pub", "ami-2051294a", 1, "t2.micro")
+	group_project = GroupProject("IOT_PROJECT", members, "SEIS_785", "clunke", "C:\users\lunk0002\misc\iot.pub", "ami-2051294a", 1, "t2.micro", "821971883038" "us-east-1")
 	
 	#Run the group project
 	group_project.run()

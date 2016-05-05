@@ -46,8 +46,9 @@ class AwsUtils:
         self.cp_utils.spawn_child_process(["aws", "ec2", "run-instances", "--image-id", image_id, "--count", count, "--instance-type", instance_type, "--key-name", key_name, "--security-group", security_group])
     def revoke_firewall_privelege(self,group_name, port, protocol, ip):
         self.cp_utils.spawn_child_process(["aws", "ec2", "revoke-security-group-ingress", "--group-name", group_name, "--protocol", protocol, "--port", port, "--cidr", ip])
-    def authorize_firewall_privelege(self,group_name, port, protocol, ip):
-        previous_ip = get_previous_ip();
+    def authorize_firewall_privelege(self,group_name, port, protocol):
+        previous_ip = self.get_previous_ip()
+		ip = self.get_my_current_ip()
         if previous_ip is not None:
             revoke_firewall_privelege(group_name, port, protocol, previous_ip)        
         self.cp_utils.spawn_child_process(["aws", "ec2", "authorize-security-group-ingress", "--group-name", group_name, "--protocol", protocol, "--port", port, "--cidr", ip])
